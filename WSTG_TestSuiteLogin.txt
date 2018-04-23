@@ -1,0 +1,60 @@
+*** Settings ***
+Library           Selenium2Library
+
+*** Variables ***
+${url}            http://testing-ground.scraping.pro/login    # This is the URL of application under test
+@{username}       admin    admin1    admin2    username1    # This List variable is defined to contain various options for username.
+@{password}       12345    admin    Password@123    Password321    # This variable contains a list of passwords.
+${successMessage}    WELCOME :)    # This is the message that web application sends in case of successful login.
+${accessDenied}    ACCESS DENIED!    # This is the message that application sends incase of invalid credentials.
+
+*** Test Cases ***
+Login_ValidCred
+    [Documentation]    Objective: To verify that WELCOME :) error message is displayed by the web application in case valid login credentials are provided.
+    ...
+    ...
+    ...    Test Steps:
+    ...
+    ...    Step 1: Access the web application using its URL.
+    ...    Step 2: Enter valid user credentials in Username and Password fields.
+    ...    Step 3: Click on Login button.
+    ...    Step 4: Validate if the application displays "WELCOME :)".
+    [Tags]    ValidLogin
+    Selenium2Library.Open Browser    ${url}    firefox
+    Selenium2Library.Input Text    //input[@name="usr"]    @{username}[0]
+    Selenium2Library.Input Text    //input[@name="pwd"]    @{password}[0]
+    Capture Page Screenshot
+    Selenium2Library.Click Element    xpath=(//input)[3]
+    Element Should Be Visible    //h3[@class="success"]    message=${successMessage}
+    Capture Page Screenshot
+    Close Browser
+
+Login_InvalidCred
+    [Documentation]    Objective: To verify that ACCESS DENIED! error message is displayed by the web application in case invalid login credentials are provided.
+    ...     \ \
+    ...     \ Test Steps:
+    ...
+    ...    Step 1: Access the web application using its URL.
+    ...    Step 2: Login to web application using invalid credentials.
+    ...    Step 3: Verify if "ACCESS DENIED!" text is displayed to user.
+    ...    Step 4: Click on "GO BACK" link button to navigate back to the login page.
+    ...    Step 5: Repeat step 1 and 2.
+    ...
+    ...
+    ...    The Automation test script makes use of a list variable whose value(test data) can be edited and hence all possible cases of invalid credentials can be tested automatically using this script.
+    [Tags]    InvalidLogin
+    Selenium2Library.Open Browser    ${url}    firefox
+    Selenium2Library.Input Text    //input[@name="usr"]    @{username}[1]
+    Selenium2Library.Input Text    //input[@name="pwd"]    @{password}[1]
+    Capture Page Screenshot
+    Selenium2Library.Click Element    xpath=(//input)[3]
+    Element Should Be Visible    //h3[@class="error"]    message=${accessDenied}
+    Capture Page Screenshot
+    Click Link    //a[@href="login"]
+    Selenium2Library.Input Text    //input[@name="usr"]    @{username}[2]
+    Selenium2Library.Input Text    //input[@name="pwd"]    @{password}[2]
+    Capture Page Screenshot
+    Selenium2Library.Click Element    xpath=(//input)[3]
+    Element Should Be Visible    //h3[@class="error"]    message=${accessDenied}
+    Capture Page Screenshot
+    Close Browser
